@@ -1,4 +1,4 @@
-package main
+package sim
 
 const PERIOD_LENGTH = 20 * 60
 
@@ -11,7 +11,24 @@ const (
 	SECOND_PERIOD
 	THIRD_PERIOD
 	POST_GAME
+	OVERTIME
 )
+
+func (c *Clock) PrintState() string {
+	switch c.Current_State {
+	case PRE_GAME:
+		return "Pre-Game"
+	case FIRST_PERIOD:
+		return "First Period"
+	case SECOND_PERIOD:
+		return "Second Period"
+	case THIRD_PERIOD:
+		return "Third Period"
+	case POST_GAME:
+		return "Post Game"
+	}
+	return ""
+}
 
 // Representation of the official in-game clock
 type Clock struct {

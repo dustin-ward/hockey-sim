@@ -1,4 +1,4 @@
-package main
+package sim
 
 // League Enum
 type League uint8
@@ -28,9 +28,10 @@ type Player struct {
 	Id               uint32
 	Handedness       Handedness
 	Age              uint8
+	Signing_status   SigningStatus
+	Current_contract Contract
+	GP               uint32
 	XGF              float64
 	XGA              float64
-	Signing_status   SigningStatus
-	Current_sontract Contract
-	GP               uint32
+	XGS              float64
 }

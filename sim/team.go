@@ -1,4 +1,4 @@
-package main
+package sim
 
 type Position uint8
 
@@ -17,7 +17,7 @@ type Team struct {
 	City             string
 	Abbreviated_Name string
 
-	Players []Player
+	Players []*Player
 
 	Forwards [][]*Player
 	Defence  [][]*Player
@@ -45,7 +45,7 @@ func NewTeam(name, city, abbreviated_name string) *Team {
 	return t
 }
 
-func (t *Team) AddPlayer(p Player) {
+func (t *Team) AddPlayer(p *Player) {
 	t.Players = append(t.Players, p)
 }
 
@@ -75,12 +75,12 @@ func (t *Team) ResetLines() {
 func (t *Team) AssignRole(player *Player, position Position, line int) error {
 	switch position {
 	case LW, C, RW:
-		if line > 2 || line < 0 {
+		if line > 3 || line < 0 {
 			return INSERT_PLAYER_INVALID_LINE
 		}
 		t.Forwards[line][position-LW] = player
 	case LD, RD:
-		if line > 1 || line < 0 {
+		if line > 2 || line < 0 {
 			return INSERT_PLAYER_INVALID_LINE
 		}
 		t.Defence[line][position-LD] = player

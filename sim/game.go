@@ -1,4 +1,4 @@
-package main
+package sim
 
 import (
 	"fmt"
@@ -21,6 +21,7 @@ type Game struct {
 }
 
 func NewGame(home_team, away_team *Team) *Game {
+	rand.Seed(time.Now().UnixNano())
 	g := new(Game)
 	g.Home_Team = home_team
 	g.Away_Team = away_team
@@ -34,25 +35,18 @@ func (g *Game) Simulate() {
 	home_fwd_line := 0
 	away_fwd_line := 0
 
-	fmt.Println("Simulating Game!")
+	fmt.Println("Scoring Summary")
+	fmt.Printf("%9s  |  %-25s |  %5s  |  %s\n", "", "PLAYER", "TIME", "PERIOD")
+	fmt.Printf("===============================================================\n")
 
+	line_timer := 0
 	for g.Clock.Tick() {
-		if g.Clock.Seconds_Remaining == 0 {
-			home_fwd_line = 0
-			away_fwd_line = 0
-			continue
+		if line_timer == 60 {
+			line_timer = 0
+			home_fwd_line = (home_fwd_line + 1) % 4
+			away_fwd_line = (away_fwd_line + 1) % 4
 		}
-		if g.Clock.Seconds_Remaining <= 750 {
-			home_fwd_line = 1
-			away_fwd_line = 1
-		} else if g.Clock.Seconds_Remaining <= 400 {
-			home_fwd_line = 2
-			away_fwd_line = 2
-		} else if g.Clock.Seconds_Remaining <= 150 {
-			home_fwd_line = 3
-			away_fwd_line = 3
-		}
-
+		line_timer++
 		g.Home_Goals += g.simulateScoring(g.Home_Team, home_fwd_line)
 		g.Away_Goals += g.simulateScoring(g.Away_Team, away_fwd_line)
 	}
@@ -73,12 +67,11 @@ func (g *Game) simulateScoring(t *Team, line int) (goals uint8) {
 		player := t.Forwards[line][j]
 		p := rand.Float64()
 		if p <= player.XGF/(3*PERIOD_LENGTH) {
-			fmt.Printf("%s GOAL! Player: %s, %s Time: %d:%d\n",
+			fmt.Printf("%s GOAL!  |  %-25s |  %s  |  %s\n",
 				t.Abbreviated_Name,
-				player.Name.Last,
-				player.Name.First,
-				g.Clock.Seconds_Remaining/60,
-				g.Clock.Seconds_Remaining%60,
+				fmt.Sprintf("%s, %s", player.Name.Last, player.Name.First),
+				fmt.Sprintf("%02d:%02d", g.Clock.Seconds_Remaining/60, g.Clock.Seconds_Remaining%60),
+				g.Clock.PrintState(),
 			)
 			goals++
 		}
