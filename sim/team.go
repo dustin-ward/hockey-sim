@@ -1,5 +1,12 @@
 package sim
 
+import (
+	"encoding/csv"
+	"fmt"
+	"os"
+	"strings"
+)
+
 type Position uint8
 
 const (
@@ -9,7 +16,41 @@ const (
 	LD
 	RD
 	G
+
+	F
+	D
+	CLW
+	CRW
+
+	INVALID
 )
+
+func GetPositionEnum(pos string) (Position, error) {
+	switch pos {
+	case "LW":
+		return LW, nil
+	case "C":
+		return C, nil
+	case "RW":
+		return RW, nil
+	case "LD":
+		return LD, nil
+	case "RD":
+		return RD, nil
+	case "G":
+		return G, nil
+	case "F":
+		return F, nil
+	case "D":
+		return D, nil
+	case "CLW":
+		return CLW, nil
+	case "CRW":
+		return CRW, nil
+	default:
+		return INVALID, INVALID_POSITION
+	}
+}
 
 type Team struct {
 	Id               uint32
@@ -24,7 +65,7 @@ type Team struct {
 	Goalies  []*Player
 }
 
-func NewTeam(name, city, abbreviated_name string) *Team {
+func NewTeam(name, city, abbreviated_name, year string) (*Team, error) {
 	t := new(Team)
 	t.Name = name
 	t.City = city
@@ -42,7 +83,11 @@ func NewTeam(name, city, abbreviated_name string) *Team {
 
 	t.Goalies = make([]*Player, 2)
 
-	return t
+	if err := t.ReadTeamFromCsv(year); err != nil {
+		return nil, err
+	}
+
+	return t, nil
 }
 
 func (t *Team) AddPlayer(p *Player) {
@@ -56,6 +101,15 @@ func (t *Team) RemovePlayer(p Player) {
 			return
 		}
 	}
+}
+
+func (t *Team) GetPlayer(name Name) *Player {
+	for _, p := range t.Players {
+		if p.Name == name {
+			return p
+		}
+	}
+	return nil
 }
 
 func (t *Team) ResetLines() {
@@ -123,4 +177,33 @@ func (t *Team) ValidateLines() bool {
 	}
 
 	return true
+}
+
+func (t *Team) ReadTeamFromCsv(year string) error {
+	lowered_name := strings.ToLower(t.Name)
+	f, err := os.Open(fmt.Sprintf("./data/%s_players_%s.csv", lowered_name, year))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	r := csv.NewReader(f)
+	if _, err := r.Read(); err != nil {
+		return err
+	}
+
+	records, err := r.ReadAll()
+	if err != nil {
+		return err
+	}
+
+	for _, record := range records {
+		p, err := NewPlayerFromSlice(record)
+		if err != nil {
+			return err
+		}
+		t.Players = append(t.Players, p)
+	}
+
+	return nil
 }

@@ -66,7 +66,7 @@ func (g *Game) simulateScoring(t *Team, line int) (goals uint8) {
 	for j := 0; j < 3; j++ {
 		player := t.Forwards[line][j]
 		p := rand.Float64()
-		if p <= player.XGF/(3*PERIOD_LENGTH) {
+		if p <= (player.EV_GF60/60)/60 {
 			fmt.Printf("%s GOAL!  |  %-25s |  %s  |  %s\n",
 				t.Abbreviated_Name,
 				fmt.Sprintf("%s, %s", player.Name.Last, player.Name.First),

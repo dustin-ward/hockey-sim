@@ -24,14 +24,11 @@ const (
 
 // Main player datatype
 type Player struct {
-	Name             Name
-	Id               uint32
-	Handedness       Handedness
-	Age              uint8
-	Signing_status   SigningStatus
-	Current_contract Contract
-	GP               uint32
-	XGF              float64
-	XGA              float64
-	XGS              float64
+	Name
+	Age int
+	Position
+
+	Stats
+
+	url string
 }
